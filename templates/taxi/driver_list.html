@@ -3,6 +3,9 @@
 {% block content %}
     <h1>Driver List
     </h1>
+  <label for="">
+    <a class="btn btn-success" href="{% url 'taxi:driver-create' %}">Add Driver</a>
+  </label>
 
     {% if driver_list %}
     <table class="table">
