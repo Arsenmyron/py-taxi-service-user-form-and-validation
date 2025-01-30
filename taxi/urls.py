@@ -63,7 +63,7 @@ urlpatterns = [
     path(
         "cars/<int:pk>/assign/",
         assign_or_remove_to_car,
-        name="assign-or-remove-to-car"),
+        name="assign-or-remove-driver-to-car"),
 ]
 
 app_name = "taxi"

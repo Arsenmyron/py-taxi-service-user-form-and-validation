@@ -1,3 +1,5 @@
+import re
+
 from django import forms
 from django.contrib.auth import get_user_model
 from django.contrib.auth.forms import UserCreationForm
@@ -5,6 +7,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import RegexValidator
 
 from taxi.models import Driver, Car
+from taxi_service.settings import LICENSE_NUMBER_PATTERN
 
 
 class DriverLicenseUpdateForm(forms.ModelForm):
@@ -15,19 +18,13 @@ class DriverLicenseUpdateForm(forms.ModelForm):
     def clean_license_number(self):
         license_number = self.cleaned_data["license_number"]
 
-        if len(license_number) != 8:
-            raise ValidationError("Invalid license number")
-        if (not license_number[:3].isalpha()
-                or not license_number[:3].isupper()):
-            raise ValidationError("Invalid license number")
-        if not license_number[3:].isdigit():
+        if not re.match(LICENSE_NUMBER_PATTERN, license_number):
             raise ValidationError("Invalid license number")
         return license_number
 
-
 class CarCreationForm(forms.ModelForm):
     drivers = forms.ModelMultipleChoiceField(
-        queryset=get_user_model().objects.all(),
+        queryset=Driver.objects.all(),
         widget=forms.CheckboxSelectMultiple,
     )
 
@@ -41,11 +38,17 @@ class DriverCreateForm(UserCreationForm):
         max_length=8,
         validators=[
             RegexValidator(
-                regex=r"^[A-Z]{3}[0-9]{5}$",
+                regex=LICENSE_NUMBER_PATTERN,
                 message="Insert valid license number",
             )
         ]
     )
+
+    def clean_license_number(self):
+        license_number = self.cleaned_data["license_number"]
+        if not re.match(LICENSE_NUMBER_PATTERN, license_number):
+            raise ValidationError("Invalid license number")
+        return license_number
 
     class Meta:
         model = Driver
