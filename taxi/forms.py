@@ -22,6 +22,7 @@ class DriverLicenseUpdateForm(forms.ModelForm):
             raise ValidationError("Invalid license number")
         return license_number
 
+
 class CarCreationForm(forms.ModelForm):
     drivers = forms.ModelMultipleChoiceField(
         queryset=Driver.objects.all(),
